@@ -1,5 +1,12 @@
+import {
+  Text,
+  View,
+  Animated,
+  StyleSheet,
+  PanResponder,
+  TouchableOpacity,
+} from 'react-native';
 import React, {useState} from 'react';
-import {Animated, PanResponder, StyleSheet, View} from 'react-native';
 
 import {CARDS, screenHeight, screenWidth} from '../../helpers/constants';
 
@@ -43,7 +50,7 @@ const Card = ({}) => {
   });
   const rotate = position.x.interpolate({
     inputRange: [-screenWidth / 2, 0, screenHeight / 2],
-    outputRange: ['-15deg', '0deg', '15deg'],
+    outputRange: ['20deg', '0deg', '-20deg'],
     extrapolate: 'clamp',
   });
   const rotateAndTranslate = {
@@ -61,33 +68,45 @@ const Card = ({}) => {
   });
 
   return (
-    <View style={styles.cardWrapper}>
-      {CARDS.map((card, index) => {
-        if (index < currentIndex) {
-          return null;
-        } else if (index === currentIndex) {
-          return (
-            <Animated.View
-              {...panResponder.panHandlers}
-              style={styles.animatedView({
-                rotateAndTranslate,
-              })}>
-              <View style={styles.card({cardColor: card?.bgColor})} />
-            </Animated.View>
-          );
-        } else {
-          return (
-            <Animated.View
-              {...panResponder.panHandlers}
-              style={styles.animatedView({
-                nextCardOpacity,
-                nextCardScale,
-              })}>
-              <View style={styles.card({cardColor: card?.bgColor})} />
-            </Animated.View>
-          );
-        }
-      }).reverse()}
+    <View style={{height: screenHeight}}>
+      <View style={styles.cardWrapper}>
+        {CARDS.map((card, index) => {
+          if (index < currentIndex) {
+            return null;
+          } else if (index === currentIndex) {
+            return (
+              <Animated.View
+                key={index}
+                {...panResponder.panHandlers}
+                style={styles.animatedView({
+                  rotateAndTranslate,
+                })}>
+                <View style={styles.card({cardColor: card?.bgColor})} />
+              </Animated.View>
+            );
+          } else {
+            return (
+              <Animated.View
+                key={index}
+                {...panResponder.panHandlers}
+                style={styles.animatedView({
+                  nextCardOpacity,
+                  nextCardScale,
+                })}>
+                <View style={styles.card({cardColor: card?.bgColor})} />
+              </Animated.View>
+            );
+          }
+        }).reverse()}
+      </View>
+      <TouchableOpacity
+        activeOpacity={0.6}
+        style={styles.doneBtnWrapper}
+        onPress={() => console.warn('Pressed done!')}>
+        <View style={styles.doneBtn}>
+          <Text style={styles.doneBtnText}>Done</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -96,8 +115,8 @@ export default Card;
 
 const styles = StyleSheet.create({
   cardWrapper: {
-    flex: 1,
     marginTop: 50,
+    height: screenHeight / 1.25,
   },
   animatedView: ({rotateAndTranslate, nextCardOpacity, nextCardScale}) => ({
     padding: 10,
@@ -109,8 +128,27 @@ const styles = StyleSheet.create({
     ...(rotateAndTranslate ? {...rotateAndTranslate} : {}),
   }),
   card: ({cardColor}) => ({
-    flex: 1,
     borderRadius: 10,
+    height: screenHeight / 1.3,
     backgroundColor: cardColor,
   }),
+  doneBtnWrapper: {
+    alignSelf: 'center',
+    width: screenWidth - 20,
+    backgroundColor: '#15cf2d',
+  },
+  doneBtn: {
+    elevation: 5,
+    borderRadius: 5,
+    width: screenWidth - 20,
+    backgroundColor: '#15cf2d',
+  },
+  doneBtnText: {
+    padding: 12,
+    fontSize: 20,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    backgroundColor: '#15cf2d',
+  },
 });
